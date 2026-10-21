@@ -1,0 +1,7 @@
+* text=auto
+# Binary files must never get their line endings rewritten.
+*.pdf binary
+*.png binary
+*.ai binary
+# Shell scripts run on Linux/macOS and break with Windows line endings.
+*.sh text eol=lf
