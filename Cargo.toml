@@ -1,0 +1,31 @@
+[package]
+name = "justafuckingpdfviewer"
+version = "0.1.0"
+edition = "2024"
+description = "A PDF viewer that just shows the PDF. Fast, tiny, pure Rust."
+license = "MIT"
+repository = "https://github.com/mezanddav/justafuckingpdfviewer"
+keywords = ["pdf", "viewer"]
+categories = ["gui"]
+
+[dependencies]
+# Only what a Windows viewer needs: OpenGL (glow) starts much faster than wgpu, and skipping
+# the system font scan and accessibility tree keeps startup short. wgpu is only the fallback
+# for machines without working OpenGL.
+eframe = { version = "0.37.0", default-features = false, features = ["glow", "wgpu", "default_fonts", "clipboard"] }
+hayro = "0.8.0"
+# hayro's rasterizer; this only turns on rendering big pages across all cores.
+vello_cpu = { version = "0.3", features = ["multithreading"] }
+
+# Linux needs a windowing backend; support both X11 and Wayland.
+[target.'cfg(target_os = "linux")'.dependencies]
+eframe = { version = "0.37.0", default-features = false, features = ["x11", "wayland"] }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[build-dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "ico"] }
+winresource = "0.1"

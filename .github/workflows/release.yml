@@ -1,0 +1,112 @@
+# Builds downloadable apps for every platform when a version tag (v1.2.3) is pushed,
+# and attaches them to a GitHub release. Can also be run by hand to just get the builds.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            arch: x64
+          - target: aarch64-pc-windows-msvc
+            arch: arm64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: cargo build --release --target ${{ matrix.target }}
+      - name: Package
+        shell: pwsh
+        run: Compress-Archive -Path target/${{ matrix.target }}/release/justafuckingpdfviewer.exe -DestinationPath justafuckingpdfviewer-windows-${{ matrix.arch }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: justafuckingpdfviewer-windows-${{ matrix.arch }}.zip
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+      - run: cargo build --release --target aarch64-apple-darwin
+      - run: cargo build --release --target x86_64-apple-darwin
+      - name: Bundle universal .app
+        run: |
+          APP=justafuckingpdfviewer.app
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+          lipo -create -output "$APP/Contents/MacOS/justafuckingpdfviewer" \
+            target/aarch64-apple-darwin/release/justafuckingpdfviewer \
+            target/x86_64-apple-darwin/release/justafuckingpdfviewer
+          VERSION=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          sed "s/VERSION/$VERSION/g" packaging/macos/Info.plist > "$APP/Contents/Info.plist"
+          mkdir AppIcon.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s packaging/icon-1024.png --out AppIcon.iconset/icon_${s}x${s}.png
+            sips -z $((s*2)) $((s*2)) packaging/icon-1024.png --out AppIcon.iconset/icon_${s}x${s}@2x.png
+          done
+          iconutil -c icns AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
+          codesign --force --deep --sign - "$APP"
+          ditto -c -k --keepParent "$APP" justafuckingpdfviewer-macos-universal.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: justafuckingpdfviewer-macos-universal.zip
+
+  linux:
+    strategy:
+      matrix:
+        include:
+          # 22.04 keeps the glibc requirement low, so the binary runs on older distros too.
+          - os: ubuntu-22.04
+            arch: x86_64
+          - os: ubuntu-22.04-arm
+            arch: aarch64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-dev libwayland-dev libx11-dev libxcursor-dev libxrandr-dev libxi-dev libgl1-mesa-dev
+      - run: cargo build --release
+      - name: Package
+        run: |
+          DIR=justafuckingpdfviewer-linux-${{ matrix.arch }}
+          mkdir "$DIR"
+          cp target/release/justafuckingpdfviewer packaging/linux/justafuckingpdfviewer.desktop \
+             packaging/linux/install.sh README.md LICENSE "$DIR/"
+          cp packaging/icon-256.png "$DIR/justafuckingpdfviewer.png"
+          chmod +x "$DIR/install.sh"
+          tar czf "$DIR.tar.gz" "$DIR"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: justafuckingpdfviewer-linux-${{ matrix.arch }}.tar.gz
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [windows, macos, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

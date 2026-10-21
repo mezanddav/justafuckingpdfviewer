@@ -1,0 +1,62 @@
+%PDF-1.7
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 314 >>
+stream
+BT /F1 28 Tf 60 752 Td (Just a PDF viewer test) Tj ET
+BT /F1 14 Tf 60 702 Td (Page one. The quick brown fox jumps over the lazy dog.) Tj ET
+BT /F1 14 Tf 60 678 Td (Second line of text, to try selecting across lines.) Tj ET
+BT /F1 14 Tf 60 654 Td (Third line: 0123456789 !?) Tj ET
+0.2 0.4 0.8 rg 60 510 200 80 re f
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 158 >>
+stream
+BT /F1 28 Tf 60 505 Td (Page two is A4 landscape) Tj ET
+BT /F1 14 Tf 60 455 Td (Selecting text here should work too.) Tj ET
+0.2 0.4 0.8 rg 60 311 200 80 re f
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 131 >>
+stream
+BT /F1 28 Tf 60 702 Td (Page three is US Letter) Tj ET
+BT /F1 14 Tf 60 652 Td (Last page.) Tj ET
+0.2 0.4 0.8 rg 60 508 200 80 re f
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000350 00000 n 
+0000000714 00000 n 
+0000000840 00000 n 
+0000001048 00000 n 
+0000001174 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R /Info << /Title (Viewer test) /Author (Claude) >> >>
+startxref
+1355
+%%EOF

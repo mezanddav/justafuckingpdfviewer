@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=justafuckingpdfviewer
+Comment=Just a PDF viewer
+Exec=justafuckingpdfviewer %f
+Icon=justafuckingpdfviewer
+MimeType=application/pdf;
+Categories=Office;Viewer;
+Terminal=false
