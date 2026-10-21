@@ -1,6 +1,8 @@
 #![windows_subsystem = "windows"]
 
-#[cfg(windows)]
+#[cfg_attr(windows, path = "assoc_windows.rs")]
+#[cfg_attr(target_os = "linux", path = "assoc_linux.rs")]
+#[cfg(any(windows, target_os = "linux"))]
 mod assoc;
 mod doc;
 mod platform;
@@ -95,7 +97,7 @@ const APP_NAME: &str = "justafuckingpdfviewer";
 const FALLBACK_RENDERER_ENV: &str = "JUSTAFUCKINGPDFVIEWER_FALLBACK_RENDERER";
 
 fn main() -> eframe::Result {
-    #[cfg(windows)]
+    #[cfg(any(windows, target_os = "linux"))]
     std::thread::spawn(assoc::register);
 
     // Start reading and parsing the PDF right away, while the window is still being created.

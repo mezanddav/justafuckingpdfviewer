@@ -1,5 +1,6 @@
 # Builds downloadable apps for every platform when a version tag (v1.2.3) is pushed,
-# and attaches them to a GitHub release. Can also be run by hand to just get the builds.
+# and attaches them to a GitHub release, one file per platform: the bare program on Windows
+# and Linux, a zipped .app on macOS. Can also be run by hand to just get the builds.
 name: Release
 
 on:
@@ -28,11 +29,11 @@ jobs:
       - run: cargo build --release --target ${{ matrix.target }}
       - name: Package
         shell: pwsh
-        run: Compress-Archive -Path target/${{ matrix.target }}/release/justafuckingpdfviewer.exe -DestinationPath justafuckingpdfviewer-windows-${{ matrix.arch }}.zip
+        run: Copy-Item target/${{ matrix.target }}/release/justafuckingpdfviewer.exe justafuckingpdfviewer-windows-${{ matrix.arch }}.exe
       - uses: actions/upload-artifact@v4
         with:
           name: windows-${{ matrix.arch }}
-          path: justafuckingpdfviewer-windows-${{ matrix.arch }}.zip
+          path: justafuckingpdfviewer-windows-${{ matrix.arch }}.exe
 
   macos:
     runs-on: macos-latest
@@ -59,11 +60,11 @@ jobs:
           done
           iconutil -c icns AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
           codesign --force --deep --sign - "$APP"
-          ditto -c -k --keepParent "$APP" justafuckingpdfviewer-macos-universal.zip
+          ditto -c -k --keepParent "$APP" justafuckingpdfviewer-macos.zip
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: justafuckingpdfviewer-macos-universal.zip
+          path: justafuckingpdfviewer-macos.zip
 
   linux:
     strategy:
@@ -84,18 +85,11 @@ jobs:
           sudo apt-get install -y libxkbcommon-dev libwayland-dev libx11-dev libxcursor-dev libxrandr-dev libxi-dev libgl1-mesa-dev
       - run: cargo build --release
       - name: Package
-        run: |
-          DIR=justafuckingpdfviewer-linux-${{ matrix.arch }}
-          mkdir "$DIR"
-          cp target/release/justafuckingpdfviewer packaging/linux/justafuckingpdfviewer.desktop \
-             packaging/linux/install.sh README.md LICENSE "$DIR/"
-          cp packaging/icon-256.png "$DIR/justafuckingpdfviewer.png"
-          chmod +x "$DIR/install.sh"
-          tar czf "$DIR.tar.gz" "$DIR"
+        run: cp target/release/justafuckingpdfviewer justafuckingpdfviewer-linux-${{ matrix.arch }}
       - uses: actions/upload-artifact@v4
         with:
           name: linux-${{ matrix.arch }}
-          path: justafuckingpdfviewer-linux-${{ matrix.arch }}.tar.gz
+          path: justafuckingpdfviewer-linux-${{ matrix.arch }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/')

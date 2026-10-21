@@ -14,15 +14,28 @@ It opens in about a tenth of a second and gets out of your way.
 
 ## Download
 
-Grab the build for your system from [Releases](https://github.com/mezanddav/justafuckingpdfviewer/releases).
+Grab the file for your system from [Releases](https://github.com/mezanddav/justafuckingpdfviewer/releases).
+Each one is the whole app; there is nothing to install.
 
-- **Windows:** unzip and run `justafuckingpdfviewer.exe`. To open PDFs with it by default:
-  right-click a PDF → *Open with* → *Choose another app* → *justafuckingpdfviewer* → *Always*.
+| System | File |
+| --- | --- |
+| Windows (most PCs) | `justafuckingpdfviewer-windows-x64.exe` |
+| Windows on ARM | `justafuckingpdfviewer-windows-arm64.exe` |
+| macOS (Apple Silicon and Intel) | `justafuckingpdfviewer-macos.zip` |
+| Linux (most PCs) | `justafuckingpdfviewer-linux-x86_64` |
+| Linux on ARM (Raspberry Pi and friends) | `justafuckingpdfviewer-linux-aarch64` |
+
+- **Windows:** run the `.exe`. To open PDFs with it by default: right-click a PDF → *Open with*
+  → *Choose another app* → *justafuckingpdfviewer* → *Always*.
 - **macOS:** unzip and move the app to Applications. The app isn't notarized yet, so the
   first time, right-click it → *Open*. Open PDFs by dropping them on the window, or with
   `open -a justafuckingpdfviewer file.pdf`.
-- **Linux:** unpack and run `./install.sh`. It installs for your user and makes it the default
-  PDF viewer.
+- **Linux:** make it executable (`chmod +x justafuckingpdfviewer-linux-*`) and run it once.
+  It adds itself to your app menu and to *Open with* for PDFs. To make it the default:
+  `xdg-mime default justafuckingpdfviewer.desktop application/pdf`.
+
+On Windows and Linux the app re-registers itself each time it starts, so if you move the file,
+just run it once from its new place.
 
 ## Keys
 

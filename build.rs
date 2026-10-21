@@ -1,5 +1,6 @@
 //! Turns `brand/jpdfw logo.png` into the exe's icon (shown by Explorer, the taskbar and on
-//! associated PDF files) plus a raw RGBA window icon, so startup does no image decoding.
+//! associated PDF files), a raw RGBA window icon, so startup does no image decoding, and a
+//! PNG for the Linux desktop entry.
 
 use image::codecs::ico::{IcoEncoder, IcoFrame};
 use image::imageops::{self, FilterType};
@@ -22,6 +23,8 @@ fn main() {
 
     let window_icon = imageops::resize(&square, 256, 256, FilterType::Lanczos3);
     std::fs::write(out.join("icon_256.rgba"), window_icon.as_raw()).unwrap();
+    // Linux installs this as the desktop icon (see assoc_linux.rs).
+    window_icon.save(out.join("icon_256.png")).unwrap();
 
     let frames: Vec<IcoFrame> = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
         .into_iter()
